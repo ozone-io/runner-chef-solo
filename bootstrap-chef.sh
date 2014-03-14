@@ -22,7 +22,7 @@ OUT="$(mktemp)"
 #user input
 export CHEF_COOKBOOKS_URL="https://github.com/ozone-io/bootstrap-chef-test-cookbooks/archive/master.tar.gz"
 export CHEF_COOKBOOKS_PATH="bootstrap-chef-test-cookbooks-master/cookbooks"
-export CHEF_ALWAYS_INSTALL_CHEF="false"
+export CHEF_ALWAYS_INSTALL_CHEF="true"
 
 #set multiline variable CHEF_SOLORB
 cat > "$OUT" << EOF
@@ -78,7 +78,7 @@ CHEF_COOKBOOK_PATH=${CHEF_COOKBOOK_PATH:-$CHEF_DEFAULT_COOKBOOK_PATH}
 CHEF_NODE_JSON=${CHEF_NODE_JSON:-$CHEF_DEFAULT_NODE_JSON}
 
 #if curl is missing, use wget
-if [ "$CHEF_ALWAYS_INSTALL_CHEF" = "true" ] || ! chef-solo --version >/dev/null 2>&1; then
+if [ "x$CHEF_ALWAYS_INSTALL_CHEF" = "xtrue" ] || ! chef-solo --version >/dev/null 2>&1; then
 	echo "-- chef not detected, Installing.."
 	echo "-- run chef install script"
 	#install with wget or curl depending on which exists.
