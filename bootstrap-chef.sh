@@ -22,8 +22,7 @@ CHEF_DEFAULT_INSTALL_SCRIPT="https://www.opscode.com/chef/install.sh"
 CHEF_DEFAULT_INSTALL_SCRIPT_ARGS=""
 CHEF_DEFAULT_COOKBOOK_PATH="/var/chef/cookbooks"
 CHEF_DEFAULT_SOLORB="cookbook_path [
-	\"/var/chef/cookbooks\",
-	\"/var/chef/site-cookbooks\"
+	\"/var/chef/cookbooks\"
 ]
 data_bag_path \"/var/chef/databags\""
 CHEF_DEFAULT_NODE_JSON="{}"
