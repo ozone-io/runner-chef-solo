@@ -9,29 +9,44 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   #config.vm.network :forwarded_port, host: 4567, guest: 80
 
-  config.vm.define "precise" do |precise|
-    precise.vm.box = "precise64"
-    precise.vm.box_url = "http://files.vagrantup.com/precise64.box"
-  end
+    config.vm.define "centos65" do |centos65|
+      centos65.vm.box = "chef/centos-6.5"
+    end
 
-  config.vm.define "saucy" do |saucy|
-    saucy.vm.box = "saucy"
-    saucy.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/saucy/current/saucy-server-cloudimg-i386-vagrant-disk1.box"
-  end
+    config.vm.define "precise64" do |precise64|
+      precise64.vm.box = "chef/ubuntu-12.04"
+    end
 
-  config.vm.define "centos6" do |centos6|
-    centos6.vm.box = "centos65"
-    centos6.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v6.5.1/centos65-x86_64-20131205.box"
-  end
+    config.vm.define "quantal64" do |quantal64|
+      quantal64.vm.box = "chef/ubuntu-12.10"
+    end
 
-  config.vm.define "centos5" do |centos5|
-    centos5.vm.box = "centos58"
-    centos5.vm.box_url = "https://dl.dropbox.com/u/17738575/CentOS-5.8-x86_64.box"
-  end
+    config.vm.define "raring64" do |raring64|
+      raring64.vm.box = "chef/ubuntu-13.04"
+    end
 
-  config.vm.define "wheezy" do |wheezy|
-    wheezy.vm.box = "wheezy"
-    wheezy.vm.box_url = "http://downloads.shadoware.org/wheezy64.box"
-  end
+    config.vm.define "saucy64" do |saucy64|
+      saucy64.vm.box = "chef/ubuntu-13.10"
+    end
+
+    config.vm.define "centos510" do |centos510|
+      centos510.vm.box = "chef/centos-5.10"
+    end
+
+    config.vm.define "wheezy" do |wheezy|
+      wheezy.vm.box = "chef/debian-7.4"
+    end
+
+    config.vm.define "squeeze" do |squeeze|
+      squeeze.vm.box = "chef/debian-6.0.8"
+    end
+
+    config.vm.define "fedora20" do |fedora20|
+      fedora20.vm.box = "chef/fedora-20"
+    end
+
+    config.vm.define "fedora19" do |fedora19|
+      fedora19.vm.box = "chef/fedora-19"
+    end
   
 end
