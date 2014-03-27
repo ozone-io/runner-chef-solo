@@ -1,7 +1,9 @@
 bootstrap-chef
 ==============
 
-A script that installs, configures and runs chef solo, that works on all recent unix distributions. (Except Arch Linux and Freebsd)
+A script that installs, configures and runs chef solo, that works on all recent unix distributions.
+
+The script takes most of the code from the chef installation script!
 
 ### Prerequisites
 * Internet Access
