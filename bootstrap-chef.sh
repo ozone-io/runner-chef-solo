@@ -374,59 +374,84 @@ tmp_dir="$tmp/install.sh.$$.`random`"
 
 tmp_stderr="$tmp/stderr.$$.`random`"
 
+###########################################################################################
 #start main script logic
-
-info "-- start script $0"
-info "-- detected os details:"
-info ""
-info "Version: $version"
-info "Platform: $platform"
-info "Platform Version: $platform_version"
-info "Machine: $machine"
-info "OS: $os"
-info ""
-
-if [ "x$CHEF_ALWAYS_INSTALL_CHEF" = "xtrue" ] || ! chef-solo --version >/dev/null 2>&1; then
-	info "-- chef not detected or installation is forced"
-	info "-- download chef install script to $tmp_dir/chef-solo-install.sh"
-	do_download "$CHEF_INSTALL_SCRIPT" "$tmp_dir/chef-solo-install.sh" 
-	info "-- run chef install script: sh $tmp_dir/chef-solo-install.sh $CHEF_INSTALL_SCRIPT_ARGS"
-	sh "$tmp_dir/chef-solo-install.sh" "$CHEF_INSTALL_SCRIPT_ARGS" 
-	info "-- finished chef install script"
-else
-	info "-- chef-solo found. skipping chef installation."
-fi
-
-info "-- creating and filling /etc/chef/solo.rb "
-mkdir -p /etc/chef
-echo "$CHEF_SOLORB" > /etc/chef/solo.rb
-info "-- finished filling /etc/chef/solo.rb"
-
-info "-- filling /etc/chef/node.json"
-echo "$CHEF_NODE_JSON" > /etc/chef/node.json
-info "-- finished filling /etc/chef/node.json"
-
-if ! test "x$CHEF_COOKBOOKS_URL" = "x"; then
-	info "-- downloading and installing cookbook(s) from $CHEF_COOKBOOKS_URL"
-	rm -rf "$CHEF_COOKBOOK_PATH"
-	#avoid errors during extraction run.
-	mkdir -p "$CHEF_COOKBOOK_PATH/noop"
-	#downloads always extract out of /var/chef. No matter what
-	chef-solo -o '' -r "$CHEF_COOKBOOKS_URL"
-	#if tar folder is set, we completely replace the cookbooks folder.
-	#if it is not, we assume that the tar.gz has a structure that allows chef-solo to extract and interpret the cookbooks by itself
-	if ! test "x$CHEF_COOKBOOKS_TAR_PATH" = "x"; then
-		warn "-- tar path set to $CHEF_COOKBOOKS_TAR_PATH. Removing old cookbooks and replacing it."
-		#todo: test if folder actually exists before doing anything.
-		rm -rf "$CHEF_COOKBOOK_PATH"
-		mv "/var/chef/$CHEF_COOKBOOKS_TAR_PATH" "$CHEF_COOKBOOK_PATH"
-	fi
-	info "-- done installing cookbooks"
-else
-	warn "-- no cookbook-url. not replacing cookbooks."
-fi
+###########################################################################################
 
 
-info "-- run chef-solo -j /etc/chef/node.json"
-chef-solo -j /etc/chef/node.json
-info "-- finished chef-solo run" 
+#############
+#install
+#############
+install_step() {
+  info "-- installing chef"
+  if [ "x$CHEF_ALWAYS_INSTALL_CHEF" = "xtrue" ] || ! chef-solo --version >/dev/null 2>&1; then
+    info "-- chef not detected or installation is forced"
+    info "-- download chef install script to $tmp_dir/chef-solo-install.sh"
+    do_download "$CHEF_INSTALL_SCRIPT" "$tmp_dir/chef-solo-install.sh"
+    info "-- run chef install script: sh $tmp_dir/chef-solo-install.sh $CHEF_INSTALL_SCRIPT_ARGS"
+    sh "$tmp_dir/chef-solo-install.sh" "$CHEF_INSTALL_SCRIPT_ARGS"
+    info "-- finished chef install script"
+  else
+    info "-- chef-solo found. skipping chef installation."
+  fi
+  return 0
+}
+
+#############
+#configure
+#############
+configure_step() {
+  info "-- creating and filling /etc/chef/solo.rb "
+  mkdir -p /etc/chef
+  echo "$CHEF_SOLORB" > /etc/chef/solo.rb
+  info "-- finished filling /etc/chef/solo.rb"
+
+  info "-- filling /etc/chef/node.json"
+  echo "$CHEF_NODE_JSON" > /etc/chef/node.json
+  info "-- finished filling /etc/chef/node.json"
+
+  if ! test "x$CHEF_COOKBOOKS_URL" = "x"; then
+    info "-- downloading and installing cookbook(s) from $CHEF_COOKBOOKS_URL"
+    rm -rf "$CHEF_COOKBOOK_PATH"
+    #avoid errors during extraction run.
+    mkdir -p "$CHEF_COOKBOOK_PATH/noop"
+    #downloads always extract out of /var/chef. No matter what
+    chef-solo -o '' -r "$CHEF_COOKBOOKS_URL"
+    #if tar folder is set, we completely replace the cookbooks folder.
+    #if it is not, we assume that the tar.gz has a structure that allows chef-solo to extract and interpret the cookbooks by itself
+    if ! test "x$CHEF_COOKBOOKS_TAR_PATH" = "x"; then
+      warn "-- tar path set to $CHEF_COOKBOOKS_TAR_PATH. Removing old cookbooks and replacing it."
+      #todo: test if folder actually exists before doing anything.
+      rm -rf "$CHEF_COOKBOOK_PATH"
+      mv "/var/chef/$CHEF_COOKBOOKS_TAR_PATH" "$CHEF_COOKBOOK_PATH"
+    fi
+    info "-- done installing cookbooks"
+  else
+    warn "-- no cookbook-url. not replacing cookbooks."
+  fi
+}
+
+#############
+#run
+#############
+run_step() {
+  info "-- run chef-solo -j /etc/chef/node.json"
+  chef-solo -j /etc/chef/node.json
+  info "-- finished chef-solo run"
+}
+case "$1" in
+    "install")
+      install_step
+    ;;
+    "configure")
+      configure_step
+    ;;
+    "run")
+      run_step
+    ;;
+    *)
+      install_step
+      configure_step
+      run_step
+    ;;
+esac
