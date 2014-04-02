@@ -334,11 +334,10 @@ tmp_stderr="$tmp/stderr.$$.`random`"
 # Start of main logic
 ###########################################################################################
 
-
 #############
-# Install Step: Installs chef solo
+# Install Stage: Installs chef solo
 #############
-install_step() {
+install_stage() {
   info "-- installing chef"
   if [ "x$CHEF_ALWAYS_INSTALL_CHEF" = "xtrue" ] || ! chef-solo --version >/dev/null 2>&1; then
     info "-- chef not detected or installation is forced"
@@ -354,9 +353,9 @@ install_step() {
 }
 
 #############
-# Configure Step: Downloads cookbooks from url and extracts them. Create your cookbooks using librarian-chef or berkshelf.
+# Configure Stage: Downloads cookbooks from url and extracts them. Create your cookbooks using librarian-chef or berkshelf.
 #############
-configure_step() {
+configure_stage() {
   info "-- creating and filling /etc/chef/solo.rb "
   mkdir -p /etc/chef
   echo "$CHEF_SOLORB" > /etc/chef/solo.rb
@@ -388,26 +387,31 @@ configure_step() {
 }
 
 #############
-#run
+# Run Stage: Executes chef-solo.
 #############
-run_step() {
+run_stage() {
   info "-- run chef-solo -j /etc/chef/node.json"
   chef-solo -j /etc/chef/node.json
   info "-- finished chef-solo run"
 }
+
+############
+# Pick your stages: If you supply an argument with install, configure or run, you can run each stage individually. 
+############
+
 case "$1" in
     "install")
-      install_step
+      install_stage
     ;;
     "configure")
-      configure_step
+      configure_stage
     ;;
     "run")
-      run_step
+      run_stage
     ;;
     *)
-      install_step
-      configure_step
-      run_step
+      install_stage
+      configure_stage
+      run_stage
     ;;
 esac
