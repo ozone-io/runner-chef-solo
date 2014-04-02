@@ -1,13 +1,24 @@
 bootstrap-chef
 ==============
 
+Ozone.io's provisioner for chef-solo:
+
 A script that installs, configures and runs chef solo, that works on all recent unix distributions.
 
-The script takes most of the code from the chef installation script!
+The helper functions and the installation-script that installs chef are created by Opscode. Thank you!
 
 ### Prerequisites
-* Internet Access
 * A Vanilla distribution: Do not have chef pre-installed by a third party.
+
+### OS supported
+
+Tested on the following using vagrant but should support more in the future. (Or already does)
+
+* _Ubuntu_: 12.04, 12.10, 13.04, 13.10
+* _CentOS_: 5.8, 5.10, 6.5
+* _Debian_: 6.0.8 (Squeeze), 7.4 (Wheezy)
+* _fedora_: 19,20
+
 
 ### Purpose:
 This script as well as its cousin [bootstrap-puppet](https://github.com/ozone-io/bootstrap-puppet) and its future cousins are part of the [ozone.io](http://ozone.io) project that aims to abstract various cloud providers and configuration management tools in a simple understandable manner to test and deploy large clusters.
@@ -29,43 +40,46 @@ When you wish to add modules/configuration, you set the following environment va
 * CHEF_NODE_JSON: This sets the configuration for chef solo.
 
 --------------
-For example, for installing modules nginx,ntp, the following configuration downloads the cookbooks from github, and installs and configures nginx and ntp.
+For example, for installing modules nginx,ntp, the following environment variables configure the script to download and install cookbooks from github. When chef-solo is run, it installs and runs ntp and nginx.
 
+    # The url of which the cookbooks can be downloaded. Should always be a tar.gz. Use github and specific branches for more control.
     export CHEF_COOKBOOKS_URL="https://github.com/ozone-io/bootstrap-chef-test-cookbooks/archive/master.tar.gz"
+    # The path in the tar.gz that contains all the cookbooks.
     export CHEF_COOKBOOKS_TAR_PATH="bootstrap-chef-test-cookbooks-master/cookbooks"
+    # This installs chef even if chef-solo exists.
     export CHEF_ALWAYS_INSTALL_CHEF="true"
-    #leave empty for latest
+    # The arguments to the chef install script. The following arg is the specification of a version.
     export CHEF_INSTALL_SCRIPT_ARGS="-v11.10.4"
-    
-    #set multiline variable CHEF_SOLORB
-    cat > "$OUT" << EOF
+
+    ## Start of environment variable settings. The following method of using heredoc and cat works on most (if not all) distributions.
+
+    #The content of the solo.rb file: http://docs.opscode.com/config_rb_solo.html
+    export CHEF_SOLORB=$(cat << "EOF"
     cookbook_path [
         "/var/chef/cookbooks"
     ]
     data_bag_path "/var/chef/databags"
     EOF
-    export CHEF_SOLORB="$(cat "$OUT")"
-    #end multiline variable CHEF_SOLORB
-    
-    #set multiline variable CHEF_NODE_JSON
-    cat > "$OUT" << EOF
+    )
+
+    #The content of the node attribute data. See the chef website
+    export CHEF_NODE_JSON=$(cat << "EOF"
     {
-    	"run_list": [
-    		"apt::default",
-    		"recipe[nginx]",
-    		"recipe[ntp]"
-    	],
-    	"ntp": {
-    		"is_server": false,
-    		"servers": [
-    			"0.pool.ntp.org",
-    			"1.pool.ntp.org"
-    		]
-    	}
+        "run_list": [
+            "apt::default",
+            "recipe[nginx]",
+            "recipe[ntp]"
+        ],
+        "ntp": {
+            "is_server": false,
+            "servers": [
+                "0.pool.ntp.org",
+                "1.pool.ntp.org"
+            ]
+        }
     }
     EOF
-    export CHEF_NODE_JSON="$(cat "$OUT")"
-    #end multiline variable CHEF_NODE_JSON
+    )
 
 ### Test
 
@@ -78,13 +92,3 @@ Examine the Vagrantfile for the distro you would like to test. Then for i.e. fed
 Vagrant will automatically execute the test script and install chef, download cookbooks, and run chef solo.
 
 * Requires vagrant 1.5+ (uses the Vagrantcloud for boxes)
-
-### OS supported
-
-Tested on the following using vagrant but should support more in the future. (Or already does)
-
-* _Ubuntu_: 12.04, 12.10, 13.04, 13.10
-* _CentOS_: 5.8, 5.10, 6.5
-* _Debian_: 6.0.8 (Squeeze), 7.4 (Wheezy)
-* _fedora_: 19,20
-

@@ -14,10 +14,27 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+
+###########################################################################################
+#
+# Ozone.io's provisioner for chef-solo
+#
+# Features:
+# * Installs chef, downloads cookbooks, runs chef solo in different stages
+# * Easily configurable due to the use of environment variables. * See test
+# * Runs on every unix distro BSD/Unix alike due to POSIX and /bin/sh compatibility. 
+#     A lot of distro's have been tested using vagrant.
+#
+# Credit:
+# * Helper functions are from Chef Omnitruck installer at opscode!
+# 
+############################################################################################
+
+#drop out at every error.
 set -e
 
-#default variables
-CHEF_DEFAULT_ALWAYS_INSTALL_CHEF="true"
+#Default options
+CHEF_DEFAULT_ALWAYS_INSTALL_CHEF="false"
 CHEF_DEFAULT_INSTALL_SCRIPT="https://www.opscode.com/chef/install.sh"
 CHEF_DEFAULT_INSTALL_SCRIPT_ARGS=""
 CHEF_DEFAULT_COOKBOOK_PATH="/var/chef/cookbooks"
@@ -34,6 +51,10 @@ CHEF_INSTALL_SCRIPT_ARGS=${CHEF_INSTALL_SCRIPT_ARGS:-$CHEF_DEFAULT_INSTALL_SCRIP
 CHEF_SOLORB=${CHEF_SOLORB:-$CHEF_DEFAULT_SOLORB}
 CHEF_COOKBOOK_PATH=${CHEF_COOKBOOK_PATH:-$CHEF_DEFAULT_COOKBOOK_PATH}
 CHEF_NODE_JSON=${CHEF_NODE_JSON:-$CHEF_DEFAULT_NODE_JSON}
+
+###########################################################################################
+# helper functions. Skip to end.
+###########################################################################################
 
 # Set up colours
 if tty -s;then
@@ -262,46 +283,6 @@ do_perl() {
   return 0
 }
 
-do_checksum() {
-  if exists sha256sum; then
-    checksum=`sha256sum $1 | awk '{ print $1 }'`
-    if test "x$checksum" != "x$2"; then
-      checksum_mismatch
-    else
-      info "Checksum compare with sha256sum succeeded."
-    fi
-  elif exists shasum; then
-    checksum=`shasum -a 256 $1 | awk '{ print $1 }'`
-    if test "x$checksum" != "x$2"; then
-      checksum_mismatch
-    else
-      info "Checksum compare with shasum succeeded."
-    fi
-  elif exists md5sum; then
-    checksum=`md5sum $1 | awk '{ print $1 }'`
-    if test "x$checksum" != "x$3"; then
-      checksum_mismatch
-    else
-      info "Checksum compare with md5sum succeeded."
-    fi
-  elif exists md5; then
-    checksum=`md5 $1 | awk '{ print $4 }'`
-    if test "x$checksum" != "x$3"; then
-      checksum_mismatch
-    else
-      info "Checksum compare with md5 succeeded."
-    fi
-  else
-    warn "Could not find a valid checksum program, pre-install shasum, md5sum or md5 in your O/S image to get valdation..."
-  fi
-}
-
-checksum_mismatch() {
-  critical "checksum mismatch!"
-  report_bug
-  exit 1
-}
-
 # do_download URL FILENAME
 do_download() {
   info "Downloading $1"
@@ -350,12 +331,12 @@ tmp_dir="$tmp/install.sh.$$.`random`"
 tmp_stderr="$tmp/stderr.$$.`random`"
 
 ###########################################################################################
-#start main script logic
+# Start of main logic
 ###########################################################################################
 
 
 #############
-#install
+# Install Step: Installs chef solo
 #############
 install_step() {
   info "-- installing chef"
@@ -373,7 +354,7 @@ install_step() {
 }
 
 #############
-#configure
+# Configure Step: Downloads cookbooks from url and extracts them. Create your cookbooks using librarian-chef or berkshelf.
 #############
 configure_step() {
   info "-- creating and filling /etc/chef/solo.rb "
@@ -390,7 +371,7 @@ configure_step() {
     rm -rf "$CHEF_COOKBOOK_PATH"
     #avoid errors during extraction run.
     mkdir -p "$CHEF_COOKBOOK_PATH/noop"
-    #downloads always extract out of /var/chef. No matter what
+    #A bug in chef-solo exists where downloads always extract out of /var/chef. No matter what configuration.
     chef-solo -o '' -r "$CHEF_COOKBOOKS_URL"
     #if tar folder is set, we completely replace the cookbooks folder.
     #if it is not, we assume that the tar.gz has a structure that allows chef-solo to extract and interpret the cookbooks by itself

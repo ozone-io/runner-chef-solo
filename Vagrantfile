@@ -7,8 +7,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell", path: "test/test-bootstrap-chef.sh"
 
-  #config.vm.network :forwarded_port, host: 4567, guest: 80
-
     config.vm.define "centos65" do |centos65|
       centos65.vm.box = "chef/centos-6.5"
     end
