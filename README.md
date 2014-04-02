@@ -1,7 +1,9 @@
 bootstrap-chef
 ==============
 
-A script that installs, configures and runs chef solo, that works on all recent unix distributions. (Except Arch Linux and Freebsd)
+A script that installs, configures and runs chef solo, that works on all recent unix distributions.
+
+The script takes most of the code from the chef installation script!
 
 ### Prerequisites
 * Internet Access
@@ -25,6 +27,7 @@ When you wish to add modules/configuration, you set the following environment va
 * CHEF_COOKBOOKS_TAR_PATH: The path in the tar where the cookbooks are located. For example `bootstrap-chef-test-cookbooks-master/cookbooks`
 * CHEF_SOLORB: This sets the configuration of chef solo and defines the content of the `solo.rb` file.
 * CHEF_NODE_JSON: This sets the configuration for chef solo.
+
 --------------
 For example, for installing modules nginx,ntp, the following configuration downloads the cookbooks from github, and installs and configures nginx and ntp.
 
