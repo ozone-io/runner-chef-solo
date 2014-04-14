@@ -1,18 +1,16 @@
 bootstrap-chef
 ==============
 
-Ozone.io's provisioner for chef-solo:
+chef-solo runner for ozone.io
 
-A script that installs, configures and runs chef solo, that works on all recent unix distributions.
+Installs, configures and runs chef solo with some configuration.
 
-The helper functions and the installation-script that installs chef are created by Opscode. Thank you!
-
-### Prerequisites
-* A Vanilla distribution: Do not have chef pre-installed by a third party.
+#### Credits
+The install script comes from opscode. Thanks!
 
 ### OS supported
 
-Tested on the following using vagrant but should support more in the future. (Or already does)
+Tested with vagrant:
 
 * _Ubuntu_: 12.04, 12.10, 13.04, 13.10
 * _CentOS_: 5.8, 5.10, 6.5
@@ -21,74 +19,33 @@ Tested on the following using vagrant but should support more in the future. (Or
 
 
 ### Purpose:
-This script as well as its cousin [bootstrap-puppet](https://github.com/ozone-io/bootstrap-puppet) and its future cousins are part of the [ozone.io](http://ozone.io) project that aims to abstract various cloud providers and configuration management tools in a simple understandable manner to test and deploy large clusters.
+This script as well as its cousin [bootstrap-puppet](https://github.com/ozone-io/bootstrap-puppet) and its future cousins are part of the [ozone.io](http://ozone.io) project.
+Ozone.io can deploy complex multi-tier infrastructure to any target such as ec2, openstack, physical and more by the push of a button.
 
 Underlying principles:
 
 * Any state introduced except by your configuration management tool "taints" the image, as your actions will be not be reproducable by your co-workers or those that will inherit your work.
-* Do not use snapshots or cloning of your machines when launch-time is not important. Rather re-deploy the same base-image and provision it from beginning to end. This will make sure the state of your cluster is always reproducable.
 * Reap the benefits of using vanilla cloud images by experimenting with various operating system versions. Upgrading a distribution will never be easier than this and at most involve you to change your configuation management parameters accordingly, which is what the cm-tool is expected of.
 
 ### How to use:
-Default with no environment variables, only puppet is installed and nothing is done.
+If not used with ozone, look at the embedded script in the Vagrantfile.
 
-When you wish to add modules/configuration, you set the following environment variables:
+There you can change config:
 
 * CHEF_COOKBOOKS_URL: The url at which cookbooks can be downloaded. For example: `https://github.com/ozone-io/bootstrap-chef-test-cookbooks/archive/master.tar.gz`
 * CHEF_COOKBOOKS_TAR_PATH: The path in the tar where the cookbooks are located. For example `bootstrap-chef-test-cookbooks-master/cookbooks`
-* CHEF_SOLORB: This sets the configuration of chef solo and defines the content of the `solo.rb` file.
-* CHEF_NODE_JSON: This sets the configuration for chef solo.
 
---------------
-For example, for installing modules nginx,ntp, the following environment variables configure the script to download and install cookbooks from github. When chef-solo is run, it installs and runs ntp and nginx.
+Or you can change files in steps/run/files:
 
-    # The url of which the cookbooks can be downloaded. Should always be a tar.gz. Use github and specific branches for more control.
-    export CHEF_COOKBOOKS_URL="https://github.com/ozone-io/bootstrap-chef-test-cookbooks/archive/master.tar.gz"
-    # The path in the tar.gz that contains all the cookbooks.
-    export CHEF_COOKBOOKS_TAR_PATH="bootstrap-chef-test-cookbooks-master/cookbooks"
-    # This installs chef even if chef-solo exists.
-    export CHEF_ALWAYS_INSTALL_CHEF="true"
-    # The arguments to the chef install script. The following arg is the specification of a version.
-    export CHEF_INSTALL_SCRIPT_ARGS="-v11.10.4"
-
-    ## Start of environment variable settings. The following method of using heredoc and cat works on most (if not all) distributions.
-
-    #The content of the solo.rb file: http://docs.opscode.com/config_rb_solo.html
-    export CHEF_SOLORB=$(cat << "EOF"
-    cookbook_path [
-        "/var/chef/cookbooks"
-    ]
-    data_bag_path "/var/chef/databags"
-    EOF
-    )
-
-    #The content of the node attribute data. See the chef website
-    export CHEF_NODE_JSON=$(cat << "EOF"
-    {
-        "run_list": [
-            "apt::default",
-            "recipe[nginx]",
-            "recipe[ntp]"
-        ],
-        "ntp": {
-            "is_server": false,
-            "servers": [
-                "0.pool.ntp.org",
-                "1.pool.ntp.org"
-            ]
-        }
-    }
-    EOF
-    )
+* solo.rb: This sets the configuration of chef solo and defines the content of the `solo.rb` file.
+* node.json: This sets the configuration for chef solo.
 
 ### Test
 
-The test folder contains settings that will install and configure ntp, nginx and mysql.
+The Vagrantfile will install and configure ntp, nginx and mysql on each vm.
 
 Examine the Vagrantfile for the distro you would like to test. Then for i.e. fedora20, excute the following:
 
     vagrant up fedora20
-
-Vagrant will automatically execute the test script and install chef, download cookbooks, and run chef solo.
 
 * Requires vagrant 1.5+ (uses the Vagrantcloud for boxes)
