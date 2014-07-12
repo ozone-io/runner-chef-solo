@@ -1,0 +1,14 @@
+--- 
+name: chef-solo
+version: "0.0.2"
+scripts: 
+  install: 
+    location: /install
+    default-variables: 
+      CHEF_ALWAYS_INSTALL_CHEF: "false"
+      CHEF_INSTALL_SCRIPT: "https://www.opscode.com/chef/install.sh"
+      CHEF_INSTALL_SCRIPT_ARGS: "-v11.10.4"
+  run: 
+    location: /run
+    default-variables: 
+      CHEF_COOKBOOK_PATH: /var/chef/cookbooks

@@ -1,14 +1,3 @@
 {
-	"run_list": [
-		"apt::default",
-		"recipe[nginx]",
-		"recipe[ntp]"
-	],
-	"ntp": {
-		"is_server": false,
-		"servers": [
-  			"0.pool.ntp.org",
-			"1.pool.ntp.org"
-		]
-	}
+	"run_list": []
 }
