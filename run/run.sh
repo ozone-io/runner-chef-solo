@@ -1,8 +1,7 @@
 #!/bin/sh
-
 mkdir -p /etc/chef
-mv "$OZONE_TMP_DIR/solo.rb" /etc/chef/solo.rb
-mv "$OZONE_TMP_DIR/node.json" /etc/chef/node.json
+cp "solo.rb" /etc/chef/solo.rb
+cp "node.json" /etc/chef/node.json
 #installing cookbooks from $CHEF_COOKBOOKS_URL
 if ! test "x$CHEF_COOKBOOKS_URL" = "x"; then
   rm -rf "$CHEF_COOKBOOK_PATH"
