@@ -1,4 +1,4 @@
-bootstrap-chef
+Ozone Runner: chef-solo
 ==============
 
 chef-solo runner for ozone.io
