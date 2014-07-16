@@ -1,8 +1,21 @@
 {
+	"app": {
+ 		"name": "mysite",
+ 		"web_dir": "/var/data/www/apps/mysite",
+		"instance_name": "no idea"
+ 	},
+        "user": {
+                "name": "nobody"
+        },
+        "nginx":{
+		"default_site_enabled": false
+        },
 	"run_list": [
 		"apt::default",
 		"recipe[nginx]",
-		"recipe[ntp]"
+		"recipe[ntp]",
+                "recipe[web]",
+                "recipe[iptables-ng::install]"
 	],
 	"ntp": {
 		"is_server": false,

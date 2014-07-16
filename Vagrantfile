@@ -56,8 +56,9 @@ start_step "run"
 ################
 
 TESTSCRIPT
-
 Vagrant.configure(2) do |config|
+    
+    config.vm.network "forwarded_port", guest: 80, host: 9100, auto_correct: true
     
     config.vm.provision "shell", inline: $masterscript
 
@@ -69,16 +70,22 @@ Vagrant.configure(2) do |config|
       precise64.vm.box = "chef/ubuntu-12.04"
     end
 
-    config.vm.define "quantal64" do |quantal64|
-      quantal64.vm.box = "chef/ubuntu-12.10"
-    end
+    #End-of-life since april
+    #config.vm.define "quantal64" do |quantal64|
+    #  quantal64.vm.box = "chef/ubuntu-12.10"
+    #end
 
-    config.vm.define "raring64" do |raring64|
-      raring64.vm.box = "chef/ubuntu-13.04"
-    end
+    #End-of-life since january 27
+    #config.vm.define "raring64" do |raring64|
+    #  raring64.vm.box = "chef/ubuntu-13.04"
+    #end
 
     config.vm.define "saucy64" do |saucy64|
       saucy64.vm.box = "chef/ubuntu-13.10"
+    end
+
+    config.vm.define "trusty64" do |trusty64|
+      trusty64.vm.box = "chef/ubuntu-14.04"
     end
 
     config.vm.define "centos510" do |centos510|
@@ -93,12 +100,14 @@ Vagrant.configure(2) do |config|
       squeeze.vm.box = "chef/debian-6.0.8"
     end
 
-    config.vm.define "fedora20" do |fedora20|
-      fedora20.vm.box = "chef/fedora-20"
-    end
+    #does not have iptables service
+    #config.vm.define "fedora20" do |fedora20|
+    #  fedora20.vm.box = "chef/fedora-20"
+    #end
 
-    config.vm.define "fedora19" do |fedora19|
-      fedora19.vm.box = "chef/fedora-19"
-    end
+    #Does not have iptables service
+    #config.vm.define "fedora19" do |fedora19|
+    #  fedora19.vm.box = "chef/fedora-19"
+    #end
 
 end
