@@ -1,9 +1,9 @@
 #Test variables that install nginx/ntp
 
 # The url of which the cookbooks can be downloaded. Should always be a tar.gz. Use github and specific branches for more control.
-export CHEF_COOKBOOKS_URL="https://github.com/ozone-io/bootstrap-chef-test-cookbooks/archive/master.tar.gz"
+export CHEF_COOKBOOKS_URL="https://github.com/ozone-io/bootstrap-chef-test-cookbooks/archive/App.tar.gz"
 # The path in the tar.gz that contains all the cookbooks.
-export CHEF_COOKBOOKS_TAR_PATH="bootstrap-chef-test-cookbooks-master/cookbooks"
+export CHEF_COOKBOOKS_TAR_PATH="bootstrap-chef-test-cookbooks-App/cookbooks"
 # This installs chef even if chef-solo exists.
 export CHEF_ALWAYS_INSTALL_CHEF="false"
 # The arguments to the chef install script. The following arg is the specification of a version.
