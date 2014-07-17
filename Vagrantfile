@@ -22,17 +22,13 @@ random () {
 if test "x$TMPDIR" = "x"; then
   export TMPDIR="/tmp"
 fi
-export OZONE_TMP_DIR="$TMPDIR/ozone/chef.$$.`random`"
+export OZONE_TMP_DIR="$TMPDIR/ozone/ozone.$$.`random`"
 (umask 077 && mkdir -p "$OZONE_TMP_DIR/workingfolder") || exit 1
 
-define_step () {
-  mkdir -p "$OZONE_TMP_DIR/runners/$RUNNER_NAME_$1/files"
-  cp -r "/vagrant$2/"* "$OZONE_TMP_DIR/runners/$RUNNER_NAME_$1/"
-  cp -r "$OZONE_TMP_DIR/runners/$RUNNER_NAME_$1/files/"* "$OZONE_TMP_DIR/workingfolder/" 2>/dev/null || true
-}
-
 start_step () {
-  ( cd "$OZONE_TMP_DIR/workingfolder" && exec "$OZONE_TMP_DIR/runners/$RUNNER_NAME_$1/$1.sh" ) || exit 1
+  export OZONE_FILES="/vagrant/test/$TEST_JOB/files"
+  export OZONE_RUNNER="/vagrant$2/files"
+  ( cd "$OZONE_TMP_DIR/workingfolder" && exec "/vagrant$2/$1.sh" ) || exit 1
 }
 
 #load test specific variables
@@ -41,18 +37,9 @@ if test -f "/vagrant/test/$TEST_JOB/variables.sh"; then
 fi
 
 ################
-# For each runner step define name and relative folder
-define_step "install" "/install"
-define_step "run" "/run"
-################
-
-# Copy test files. Will overwrite runnerfiles if available.
-cp -r "/vagrant/test/$TEST_JOB/files/"* "$OZONE_TMP_DIR/workingfolder/" 2>/dev/null || true
-
-################
 # Run each step in the following order
-start_step "install"
-start_step "run"
+start_step "install" "/install"
+start_step "run" "/run"
 ################
 
 TESTSCRIPT

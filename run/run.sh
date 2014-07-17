@@ -1,7 +1,17 @@
 #!/bin/sh
+#Use $OZONE_FILES for folder containing state files
+#Use $OZONE_RUNNER for folder containing runner files
 mkdir -p /etc/chef
-cp "solo.rb" /etc/chef/solo.rb
-cp "node.json" /etc/chef/node.json
+if test -f "$OZONE_FILES/node.json"; then
+  cp "$OZONE_FILES/node.json" /etc/chef/node.json
+else 
+  cp "$OZONE_RUNNER/default_node.json" /etc/chef/node.json
+fi
+if test -f "$OZONE_FILES/solo.rb"; then
+  cp "$OZONE_FILES/solo.rb" /etc/chef/solo.rb
+else 
+  cp "$OZONE_RUNNER/default_solo.rb" /etc/chef/solo.rb
+fi
 #installing cookbooks from $CHEF_COOKBOOKS_URL
 if ! test "x$CHEF_COOKBOOKS_URL" = "x"; then
   rm -rf "$CHEF_COOKBOOK_PATH"
